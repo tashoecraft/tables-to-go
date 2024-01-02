@@ -26,8 +26,11 @@ type Database interface {
 	Close() (err error)
 
 	GetTables() (tables []*Table, err error)
+	GetViews() (tables []*Table, err error)
 	PrepareGetColumnsOfTableStmt() (err error)
+	PrepareGetColumnsOfViewStmt() (err error)
 	GetColumnsOfTable(table *Table) (err error)
+	GetColumnsOfView(table *Table) (err error)
 
 	IsPrimaryKey(column Column) bool
 	IsAutoIncrement(column Column) bool
@@ -77,6 +80,7 @@ type Column struct {
 // databases it implements partly the Database interface.
 type GeneralDatabase struct {
 	GetColumnsOfTableStmt *sqlx.Stmt
+	GetColumnsOfViewStmt  *sqlx.Stmt
 	*sqlx.DB
 	*settings.Settings
 	driver string

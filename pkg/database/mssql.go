@@ -86,6 +86,54 @@ func (mssql *MsSQL) GetColumnsOfTable(table *Table) (err error) {
 	return err
 }
 
+func (mssql *MsSQL) GetViews() (views []*Table, err error) {
+	err = mssql.Select(&views, `
+  	SELECT table_name AS table_name
+        FROM information_schema.views
+        WHERE table_schema = 'dbo'
+        ORDER BY table_name
+    `, mssql.DbName)
+
+	if mssql.Verbose {
+		if err != nil {
+			fmt.Println("> Error at GetViews()")
+			fmt.Printf("> schema: %q\r\n", mssql.DbName)
+		}
+	}
+
+	return views, err
+}
+
+func (mssql *MsSQL) PrepareGetColumnsOfViewStmt() (err error) {
+	mssql.GetColumnsOfViewStmt, err = mssql.Preparex(`
+        SELECT
+          ordinal_position,
+          column_name,
+          data_type,
+          column_default,
+          is_nullable,
+          character_maximum_length,
+          numeric_precision
+        FROM information_schema.columns
+        WHERE table_name = @ViewName
+        ORDER BY ordinal_position
+    `)
+	return err
+}
+
+func (mssql *MsSQL) GetColumnsOfView(view *Table) (err error) {
+	err = mssql.GetColumnsOfViewStmt.Select(&view.Columns, sql.Named("ViewName", view.Name))
+	if mssql.Settings.Verbose {
+		if err != nil {
+			fmt.Printf("> Error at GetColumnsOfView(%v)\r\n", view.Name)
+			fmt.Printf("> schema: %q\r\n", mssql.Schema)
+			fmt.Printf("> dbName: %q\r\n", mssql.DbName)
+		}
+	}
+
+	return err
+}
+
 func (mssql *MsSQL) IsPrimaryKey(column Column) bool {
 	return strings.Contains(column.ColumnKey, "PRI")
 }

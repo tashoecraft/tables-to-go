@@ -14,6 +14,21 @@ type SQLite struct {
 	*GeneralDatabase
 }
 
+func (s *SQLite) GetViews() (tables []*Table, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *SQLite) PrepareGetColumnsOfViewStmt() (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *SQLite) GetColumnsOfView(table *Table) (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewSQLite creates a new SQLite database.
 func NewSQLite(s *settings.Settings) *SQLite {
 	return &SQLite{

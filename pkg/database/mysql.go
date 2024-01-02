@@ -17,6 +17,21 @@ type MySQL struct {
 	defaultUserName string
 }
 
+func (mysql *MySQL) GetViews() (tables []*Table, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (mysql *MySQL) PrepareGetColumnsOfViewStmt() (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (mysql *MySQL) GetColumnsOfView(table *Table) (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewMySQL creates a new MySQL database.
 func NewMySQL(s *settings.Settings) *MySQL {
 	return &MySQL{

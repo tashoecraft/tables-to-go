@@ -86,6 +86,61 @@ func Run(settings *settings.Settings, db database.Database, out output.Writer) (
 		}
 	}
 
+	views, err := db.GetViews()
+	if err != nil {
+		return fmt.Errorf("could not get tables: %w", err)
+	}
+
+	if settings.Verbose {
+		fmt.Printf("> number of views: %v\r\n", len(views))
+	}
+
+	if err = db.PrepareGetColumnsOfViewStmt(); err != nil {
+		return fmt.Errorf("could not prepare the get-column-statement: %w", err)
+	}
+
+	for _, view := range views {
+
+		if settings.Verbose {
+			fmt.Printf("> processing view %q\r\n", view.Name)
+		}
+
+		if err = db.GetColumnsOfView(view); err != nil {
+			if !settings.Force {
+				return fmt.Errorf("could not get columns of view %q: %w", view.Name, err)
+			}
+			fmt.Printf("could not get columns of view %q: %v\n", view.Name, err)
+			continue
+		}
+
+		if settings.Verbose {
+			fmt.Printf("\t> number of columns: %v\r\n", len(view.Columns))
+		}
+
+		tableName, content, err := createTableStructString(settings, db, view)
+
+		if err != nil {
+			if !settings.Force {
+				return fmt.Errorf("could not create string for table %q: %w", view.Name, err)
+			}
+			fmt.Printf("could not create string for table %q: %v\n", view.Name, err)
+			continue
+		}
+
+		fileName := camelCaseString(tableName)
+		if settings.IsFileNameFormatSnakeCase() {
+			fileName = strcase.ToSnake(fileName)
+		}
+
+		err = out.Write(fileName, content)
+		if err != nil {
+			if !settings.Force {
+				return fmt.Errorf("could not write struct for table %q: %w", view.Name, err)
+			}
+			fmt.Printf("could not write struct for table %q: %v\n", view.Name, err)
+		}
+	}
+
 	fmt.Println("done!")
 
 	return nil

@@ -46,6 +46,16 @@ func (db *mockDb) GetColumnsOfTable(table *database.Table) (err error) {
 	return nil
 }
 
+func (db *mockDb) PrepareGetColumnsOfViewStmt() (err error) {
+	db.Called()
+	return nil
+}
+
+func (db *mockDb) GetViews(table *database.Table) (err error) {
+	db.Called(table)
+	return nil
+}
+
 type mockWriter struct {
 	mock.Mock
 }

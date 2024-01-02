@@ -17,6 +17,21 @@ type Postgresql struct {
 	defaultUserName string
 }
 
+func (pg *Postgresql) GetViews() (tables []*Table, err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (pg *Postgresql) PrepareGetColumnsOfViewStmt() (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (pg *Postgresql) GetColumnsOfView(table *Table) (err error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // NewPostgresql creates a new Postgresql database.
 func NewPostgresql(s *settings.Settings) *Postgresql {
 	return &Postgresql{
