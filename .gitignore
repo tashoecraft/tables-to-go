@@ -30,3 +30,6 @@ _testmain.go
 .DS_Store
 
 tables-to-go
+
+vendor
+./vendor

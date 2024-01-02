@@ -14,6 +14,7 @@ const (
 	DBTypePostgresql DBType = "pg"
 	DBTypeMySQL      DBType = "mysql"
 	DBTypeSQLite     DBType = "sqlite3"
+	DBTypeMsSQL      DBType = "mssql"
 )
 
 // Set sets the datatype for the custom type for the flag package.
@@ -40,6 +41,7 @@ const (
 	NullTypeSQL       NullType = "sql"
 	NullTypeNative    NullType = "native"
 	NullTypePrimitive NullType = "primitive"
+	NullV4            NullType = "null"
 )
 
 // NullType represents a null type.
@@ -122,6 +124,7 @@ var (
 		DBTypePostgresql: true,
 		DBTypeMySQL:      true,
 		DBTypeSQLite:     true,
+		DBTypeMsSQL:      true,
 	}
 
 	// supportedOutputFormats represents the supported output formats
@@ -134,6 +137,7 @@ var (
 	dbDefaultPorts = map[DBType]string{
 		DBTypePostgresql: "5432",
 		DBTypeMySQL:      "3306",
+		DBTypeMsSQL:      "1433",
 		DBTypeSQLite:     "",
 	}
 
@@ -142,6 +146,7 @@ var (
 		NullTypeSQL:       true,
 		NullTypeNative:    true,
 		NullTypePrimitive: true,
+		NullV4:            true,
 	}
 
 	// supportedFileNameFormats represents the supported filename formats
@@ -306,6 +311,10 @@ func SprintfSupportedNullTypes() string {
 // null type SQL
 func (settings *Settings) IsNullTypeSQL() bool {
 	return settings.Null == NullTypeSQL
+}
+
+func (settings *Settings) IsNullTypeNull() bool {
+	return settings.Null == NullV4
 }
 
 // ShouldInitialism returns whether column names should be converted

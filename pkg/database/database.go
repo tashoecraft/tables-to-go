@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/fraenky8/tables-to-go/pkg/settings"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/microsoft/go-mssqldb"
 )
 
 var (
@@ -15,6 +15,7 @@ var (
 		settings.DBTypePostgresql: "postgres",
 		settings.DBTypeMySQL:      "mysql",
 		settings.DBTypeSQLite:     "sqlite3",
+		settings.DBTypeMsSQL:      "sqlserver",
 	}
 )
 
@@ -89,6 +90,8 @@ func New(s *settings.Settings) Database {
 	switch s.DbType {
 	case settings.DBTypeSQLite:
 		db = NewSQLite(s)
+	case settings.DBTypeMsSQL:
+		db = NewMssql(s)
 	case settings.DBTypeMySQL:
 		db = NewMySQL(s)
 	case settings.DBTypePostgresql:

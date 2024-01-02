@@ -191,6 +191,10 @@ func generateImports(content *strings.Builder, settings *settings.Settings, colu
 		content.WriteString("\t\"database/sql\"\n")
 	}
 
+	if settings.IsNullTypeNull() {
+		content.WriteString("\t\"gopkg.in/guregu/null.v4\"\n")
+	}
+
 	if columnInfo.isTemporal {
 		content.WriteString("\t\"time\"\n")
 	}
@@ -206,13 +210,13 @@ func mapDbColumnTypeToGoType(s *settings.Settings, db database.Database, column 
 	if db.IsInteger(column) {
 		goType = "int"
 		if db.IsNullable(column) {
-			goType = getNullType(s, "*int", "sql.NullInt64")
+			goType = getNullType(s, "*int", "sql.NullInt64", "null.Int")
 			columnInfo.isNullable = true
 		}
 	} else if db.IsFloat(column) {
 		goType = "float64"
 		if db.IsNullable(column) {
-			goType = getNullType(s, "*float64", "sql.NullFloat64")
+			goType = getNullType(s, "*float64", "sql.NullFloat64", "null.Float")
 			columnInfo.isNullable = true
 		}
 	} else if db.IsTemporal(column) {
@@ -220,7 +224,7 @@ func mapDbColumnTypeToGoType(s *settings.Settings, db database.Database, column 
 			goType = "time.Time"
 			columnInfo.isTemporal = true
 		} else {
-			goType = getNullType(s, "*time.Time", "sql.NullTime")
+			goType = getNullType(s, "*time.Time", "sql.NullTime", "null.Time")
 			columnInfo.isTemporal = s.Null == settings.NullTypeNative
 			columnInfo.isNullable = true
 		}
@@ -230,14 +234,14 @@ func mapDbColumnTypeToGoType(s *settings.Settings, db database.Database, column 
 		case "boolean":
 			goType = "bool"
 			if db.IsNullable(column) {
-				goType = getNullType(s, "*bool", "sql.NullBool")
+				goType = getNullType(s, "*bool", "sql.NullBool", "null.Bool")
 				columnInfo.isNullable = true
 			}
 		default:
 			// Everything else we cannot detect defaults to (nullable) string.
 			goType = "string"
 			if db.IsNullable(column) {
-				goType = getNullType(s, "*string", "sql.NullString")
+				goType = getNullType(s, "*string", "sql.NullString", "null.String")
 				columnInfo.isNullable = true
 			}
 		}
@@ -264,9 +268,13 @@ func camelCaseString(s string) string {
 	return cc
 }
 
-func getNullType(settings *settings.Settings, primitive string, sql string) string {
+func getNullType(settings *settings.Settings, primitive string, sql string, null string) string {
 	if settings.IsNullTypeSQL() {
 		return sql
+	}
+
+	if settings.IsNullTypeNull() {
+		return null
 	}
 	return primitive
 }
